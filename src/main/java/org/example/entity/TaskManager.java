@@ -1,7 +1,8 @@
 package org.example.entity;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import static org.example.config.Constants.*;
 
@@ -13,40 +14,40 @@ public class TaskManager {
 
     public void createTask(Task task) {
         task.setId(id);
-        this.tasks.put(task.getId(), task);
-        this.id++;
+        tasks.put(task.getId(), task);
+        id++;
     }
 
     public void createEpic(Epic epic) {
         epic.setId(id);
-        this.epics.put(epic.getId(), epic);
-        this.id++;
+        epics.put(epic.getId(), epic);
+        id++;
     }
 
     public void createSubtask(Subtask subtask) {
         subtask.setId(id);
-        this.subtasks.put(subtask.getId(), subtask);
-        this.id++;
+        subtasks.put(subtask.getId(), subtask);
+        id++;
     }
 
     public void putTask(int id, Task task) {
-        this.tasks.put(id, task);
+        tasks.put(id, task);
     }
 
     public void putEpic(int id, Epic epic) {
-        this.epics.put(id, epic);
+        epics.put(id, epic);
     }
 
     public void putSubtask(int id, Subtask subtask) {
-        this.subtasks.put(id, subtask);
+        subtasks.put(id, subtask);
     }
 
     public void updateTask(int id, String name, String description, int state) {
-        Task task = this.tasks.get(id);
+        Task task = tasks.get(id);
         task.setName(name);
         task.setDescription(description);
         task.setState(state);
-        this.tasks.put(task.getId(), task);
+        tasks.put(task.getId(), task);
     }
 
     private void updateEpic(Epic epic) {
@@ -54,7 +55,7 @@ public class TaskManager {
         boolean hasNew = false;
         for(int subtaskId : epic.getSubtasks()){
             if(!epic.getSubtasks().isEmpty()) {
-                int currentState = this.subtasks.get(subtaskId).getState();
+                int currentState = subtasks.get(subtaskId).getState();
                 if(currentState == NEW) {
                     hasNew = true;
                 }
@@ -62,30 +63,30 @@ public class TaskManager {
                     isDone = true;
                 } else if(currentState == IN_PROCESS) {
                     epic.setState(IN_PROCESS);
-                    this.epics.remove(epic.getId());
-                    this.epics.put(epic.getId(), epic);
+                    epics.remove(epic.getId());
+                    epics.put(epic.getId(), epic);
                     break;
                 }
             }
         }
         if(isDone&&hasNew) {
             epic.setState(IN_PROCESS);
-            this.epics.remove(epic.getId());
-            this.epics.put(epic.getId(), epic);
+            epics.remove(epic.getId());
+            epics.put(epic.getId(), epic);
         } else if(isDone) {
             epic.setState(DONE);
-            this.epics.remove(epic.getId());
-            this.epics.put(epic.getId(), epic);
+            epics.remove(epic.getId());
+            epics.put(epic.getId(), epic);
         }
     }
 
     public void updateSubtask(int id, String name, String description, int state) {
         Subtask subtask = subtasks.get(id);
-        this.subtasks.remove(id);
+        subtasks.remove(id);
         subtask.setName(name);
         subtask.setDescription(description);
         subtask.setState(state);
-        this.subtasks.put(id, subtask);
+        subtasks.put(id, subtask);
         updateEpic(epics.get(subtask.getEpicId()));
     }
 
@@ -102,39 +103,45 @@ public class TaskManager {
         return subtasks.get(id);
     }
 
-    public Collection<Task> getAllTasks() {
-        return tasks.values();
+    public List<Task> getAllTasks() {
+        return new ArrayList<>(tasks.values());
     }
 
-    public Collection<Epic> getAllEpics() {
-        return epics.values();
+    public List<Epic> getAllEpics() {
+        return new ArrayList<>(epics.values());
     }
 
-    public Collection<Subtask> getAllSubtasks() {
-        return subtasks.values();
+    public List<Subtask> getAllSubtasks() {
+        return new ArrayList<>(subtasks.values());
     }
 
     public void deleteTask(int id) {
-        this.tasks.remove(id);
+        tasks.remove(id);
     }
 
     public void deleteEpic(int id) {
-        this.epics.remove(id);
+        epics.remove(id);
     }
 
     public void deleteSubtask(int id) {
-        this.subtasks.remove(id);
+        Epic epic = epics.get(subtasks.get(id).getEpicId());
+        epic.deleteSubtask(id);
+        subtasks.remove(id);
+        updateEpic(epic);
     }
 
     public void deleteAllTasks() {
-        this.tasks.clear();
+        tasks.clear();
     }
 
     public void deleteAllEpics() {
-        this.epics.clear();
+        epics.clear();
     }
 
     public void deleteAllSubtasks() {
-        this.subtasks.clear();
+        for(Subtask subtask : getAllSubtasks()) {
+            epics.get(subtask.getEpicId()).clearSubtasks();
+        }
+        subtasks.clear();
     }
 }
