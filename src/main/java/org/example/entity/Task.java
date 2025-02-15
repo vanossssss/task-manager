@@ -1,12 +1,14 @@
 package org.example.entity;
 
-import static org.example.config.Constants.NEW;
+import org.example.enums.States;
+
+import static org.example.enums.States.NEW;
 
 public class Task {
     protected int id;
     protected String name;
     protected String description;
-    protected int state;
+    protected States state;
 
     public Task(int id, String name, String description){
         this.id = id;
@@ -44,11 +46,11 @@ public class Task {
         this.description = description;
     }
 
-    public int getState() {
+    public States getState() {
         return state;
     }
 
-    public void setState(int state) {
+    public void setState(States state) {
         this.state = state;
     }
 }
