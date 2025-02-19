@@ -92,12 +92,13 @@ public class InMemoryTaskManager implements TaskManager{
     }
 
     @Override
-    public void updateSubtask(int id, String name, String description, States state) {
+    public void updateSubtask(int id, String name, String description, States state, int epicId) {
         Subtask subtask = subtasks.get(id);
         subtasks.remove(id);
         subtask.setName(name);
         subtask.setDescription(description);
         subtask.setState(state);
+        subtask.setEpicId(epicId);
         subtasks.put(id, subtask);
         updateEpic(epics.get(subtask.getEpicId()));
     }

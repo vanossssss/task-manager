@@ -19,7 +19,7 @@ public interface TaskManager {
 
     void updateTask(int id, String name, String description, States state);
 
-    void updateSubtask(int id, String name, String description, States state);
+    void updateSubtask(int id, String name, String description, States state, int epicId);
 
     Task getTask(int id);
 
